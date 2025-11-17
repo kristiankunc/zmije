@@ -17,7 +17,7 @@ else:
     print("x je nula")
 
 # smyčka for
-for i in [1.2   , 3]:
+for i in [1, 2, 3]:
     print("číslo v seznamu:", i)
 
 # smyčka while

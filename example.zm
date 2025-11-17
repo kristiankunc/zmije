@@ -17,8 +17,8 @@ jinak:
     vytiskni(„x je nula")
 
 # smyčka for
-pro i v [1, 2, 3]:
-    vytiskni(„číslo v seznamu:", i)
+pro i v [1; 2; 3]:
+    vytiskni(„číslo v seznamu:"; i)
 
 # smyčka while
 při x < 5:
