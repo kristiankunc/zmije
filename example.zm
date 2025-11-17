@@ -5,24 +5,24 @@ výraz = Pravda
 počet = Nic
 cena = 19,99
 průměr = 3,14
-zpráva = „Ahoj světe‟
-pokyn = „Zadej číslo‟
+zpráva = „Ahoj světe"
+pokyn = „Zadej číslo"
 
 # podmínka
 právě když x > 0:
-    print(„x je kladné číslo‟)
+    print(„x je kladné číslo")
 jinkdyž x < 0:
-    print("x je záporné číslo")
+    print(„x je záporné číslo")
 jinak:
-    print("x je nula")
+    print(„x je nula")
 
 # smyčka for
 pro i v [1, 2, 3]:
-    print("číslo v seznamu:", i)
+    print(„číslo v seznamu:", i)
 
 # smyčka while
 při x < 5:
-    print("x =", x)
+    print(„x =", x)
     x = x + 1
 
 # definice třídy
@@ -40,16 +40,16 @@ dovézt sys
 zkus:
     výsledek = 10 / 0
 kromě:
-    print("Chyba při dělení")
+    print(„Chyba při dělení")
 konečně:
-    print("Konec bloku zkus")
+    print(„Konec bloku zkus")
 
 # return
 def sečti(a, b):
     vrať a + b
 
 # with statement
-s open("soubor.txt") jako f:
+s open(„soubor.txt") jako f:
     obsah = f.read()
 
 # yield
@@ -61,4 +61,4 @@ def generátor():
 smaz x
 
 # raise
-povznes ValueError("Neplatná hodnota")
+povznes ValueError(„Neplatná hodnota")
