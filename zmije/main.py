@@ -156,12 +156,23 @@ def validate_variables_capitalized(code):
         # Re-raise tokenization errors (e.g., invalid variable names)
         raise ValueError(f"Invalid code: {e}")
     
-    # Try to compile to catch syntax errors early
-    try:
-        compile(code_normalized, '<validate>', 'exec')
-    except SyntaxError as e:
-        # Raise as ValueError for consistency with validation errors
-        raise ValueError(f"Invalid code: {e}")
+    # Check for invalid syntax patterns like NUMBER followed by NAME (but not a keyword)
+    i = 0
+    while i < len(tokens) - 1:
+        tok = tokens[i]
+        next_tok = tokens[i + 1]
+        
+        # Check for NUMBER immediately followed by NAME (invalid Python)
+        # But exclude if the NAME is a keyword
+        if (tok.type == tokenize.NUMBER and next_tok.type == tokenize.NAME and
+            next_tok.string.lower() not in czech_keywords and
+            next_tok.string not in python_keywords):
+            raise ValueError(
+                f"Invalid code: cannot have a number literal directly followed by a variable name "
+                f"at line {next_tok.start[0]}, column {next_tok.start[1]}"
+            )
+        
+        i += 1
     
     # Look for variables being assigned: NAME = ...
     i = 0
@@ -260,7 +271,7 @@ def transpile(code):
         return result
     
     except ValueError as e:
-        print(f"Validation Error: {e}")
+        # Re-raise without printing to avoid encoding issues
         raise
     except tokenize.TokenError as e:
         print(f"Error: Failed to tokenize code: {e}")

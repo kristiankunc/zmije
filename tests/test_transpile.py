@@ -9,43 +9,43 @@ class TestTranspile:
 
     def test_transpile_simple_keywords(self):
         """Test transpilation of simple single-word Czech keywords."""
-        code = "pravdivá_hodnota = Pravda"
+        code = "Pravdivá_hodnota = Pravda"
         result = transpile(code)
         assert "True" in result
 
     def test_transpile_multi_word_keywords(self):
         """Test transpilation of multi-word Czech keywords like 'právě když'."""
-        code = 'právě když x > 0:\n    vytiskni("text")'
+        code = 'právě když X > 0:\n    vytiskni("text")'
         result = transpile(code)
         assert "if" in result
 
     def test_transpile_decimal_separator_czech(self):
         """Test conversion of Czech decimal separator (comma) to dot."""
-        code = "číslo = 3,14"
+        code = "Číslo = 3,14"
         result = transpile(code)
         assert "3.14" in result
 
     def test_transpile_decimal_with_leading_zero(self):
         """Test decimal separator with leading zero."""
-        code = "malé = 0,5"
+        code = "Malé = 0,5"
         result = transpile(code)
         assert "0.5" in result
 
     def test_transpile_list_separator(self):
         """Test conversion of semicolons to commas in lists."""
-        code = "seznam = [1; 2; 3]"
+        code = "Seznam = [1; 2; 3]"
         result = transpile(code)
         assert "[1,2,3]" in result.replace(" ", "")
 
     def test_transpile_czech_quotes(self):
         """Test conversion of Czech quotes to regular quotes."""
-        code = 'zpráva = "Ahoj světe"'
+        code = 'Zpráva = "Ahoj světe"'
         result = transpile(code)
         assert '"Ahoj' in result
 
     def test_transpile_dict_with_semicolon_separator(self):
         """Test dictionary with semicolon separators."""
-        code = 'data = {"jméno": "Karel"; "věk": 30}'
+        code = 'Data = {"jméno": "Karel"; "věk": 30}'
         result = transpile(code)
         # Check that semicolon is converted to comma
         assert '"jméno"' in result
@@ -67,7 +67,7 @@ class TestTranspile:
 
     def test_transpile_try_except(self):
         """Test transpilation of try-except-finally."""
-        code = 'zkus:\n    výsledek = 10 / 0\nkromě:\n    vytiskni("Chyba")\nkonečně:\n    vytiskni("Konec")'
+        code = 'zkus:\n    Výsledek = 10 / 0\nkromě:\n    vytiskni("Chyba")\nkonečně:\n    vytiskni("Konec")'
         result = transpile(code)
         assert "try" in result
         assert "except" in result
@@ -75,20 +75,20 @@ class TestTranspile:
 
     def test_transpile_class_definition(self):
         """Test transpilation of class definitions."""
-        code = "klasa Zvire:\n    def __init__(self; jméno):\n        self.jméno = jméno"
+        code = "klasa Zvire:\n    def __init__(self; Jméno):\n        self.Jméno = Jméno"
         result = transpile(code)
         assert "class" in result
 
     def test_transpile_for_loop(self):
         """Test transpilation of for loops."""
-        code = "pro i v seznam:\n    vytiskni(i)"
+        code = "pro I v Seznam:\n    vytiskni(I)"
         result = transpile(code)
         assert "for" in result
         assert "in" in result
 
     def test_transpile_while_loop(self):
         """Test transpilation of while loops."""
-        code = "při x < 5:\n    vytiskni(x)"
+        code = "při X < 5:\n    vytiskni(X)"
         result = transpile(code)
         assert "while" in result
 
@@ -106,7 +106,7 @@ class TestTranspile:
 
     def test_transpile_with_statement(self):
         """Test transpilation of with statement."""
-        code = 's open("soubor.txt") jako f:\n    obsah = f.read()'
+        code = 's open("soubor.txt") jako F:\n    Obsah = F.read()'
         result = transpile(code)
         assert "with" in result
         assert "as" in result
@@ -119,14 +119,14 @@ class TestTranspile:
 
     def test_transpile_is_keyword(self):
         """Test transpilation of 'is' keyword."""
-        code = 'pokud x je Nic:\n    vytiskni("prázdno")'
+        code = 'pokud X je Nic:\n    vytiskni("prázdno")'
         result = transpile(code)
         # Note: "pokud" is not in KEYWORD_MAP, but "je" should be
         assert "is" in result or "None" in result
 
     def test_transpile_logical_operators(self):
         """Test transpilation of logical operators."""
-        code = 'pokud x > 0 a y < 10 nebo z == 5:\n    vytiskni("ok")'
+        code = 'pokud X > 0 a Y < 10 nebo Z == 5:\n    vytiskni("ok")'
         result = transpile(code)
         assert "and" in result or "or" in result
 
@@ -158,7 +158,7 @@ class TestTranspile:
 
     def test_transpile_complex_expression(self):
         """Test transpilation of complex mixed expressions."""
-        code = "klasa Test:\n    def metoda(self; x):\n        pokud x > 0,5 a x < 9,99:\n            seznam = [1; 2; 3]\n            vrať seznam\n        jinak:\n            vrať Nic"
+        code = "klasa Test:\n    def metoda(self; X):\n        pokud X > 0,5 a X < 9,99:\n            Seznam = [1; 2; 3]\n            vrať Seznam\n        jinak:\n            vrať Nic"
         result = transpile(code)
         assert "class" in result
         assert "def" in result
@@ -169,14 +169,14 @@ class TestTranspile:
 
     def test_transpile_output_is_valid_python(self):
         """Test that transpiled code is valid Python."""
-        code = 'x = Pravda\ny = 3,14\nzpráva = "Ahoj"'
+        code = 'X = Pravda\nY = 3,14\nZpráva = "Ahoj"'
         result = transpile(code)
         # This should not raise an exception
         compile(result, '<test>', 'exec')
 
     def test_transpile_preserves_indentation(self):
         """Test that transpilation preserves code indentation."""
-        code = "pro i v [1; 2; 3]:\n    vytiskni(i)"
+        code = "pro I v [1; 2; 3]:\n    vytiskni(I)"
         result = transpile(code)
         # Check indentation is preserved
         lines = result.split('\n')
@@ -184,13 +184,13 @@ class TestTranspile:
 
     def test_transpile_preserves_comments(self):
         """Test that transpilation preserves comments."""
-        code = "# Komentář v češtině\nx = 5"
+        code = "# Komentář v češtině\nX = 5"
         result = transpile(code)
         assert "Koment" in result or "# " in result
 
     def test_transpile_multiple_decimals_in_sequence(self):
         """Test multiple decimal numbers in a single expression."""
-        code = "součet = 1,5 + 2,7"
+        code = "Součet = 1,5 + 2,7"
         result = transpile(code)
         assert "1.5" in result
         assert "2.7" in result
@@ -282,20 +282,20 @@ class TestTranspileEdgeCases:
 
     def test_transpile_whitespace_handling(self):
         """Test that transpilation handles various whitespace."""
-        code = "právě   když   x > 0:\n    vytiskni(„ok\")"
+        code = "právě   když   X > 0:\n    vytiskni(„ok\")"
         result = transpile(code)
         assert "if" in result
 
     def test_transpile_mixed_czech_quotes(self):
         """Test handling of mixed quote types."""
-        code = 'text = "Ahoj"\ntext2 = "normální"'
+        code = 'Text = "Ahoj"\nText2 = "normální"'
         result = transpile(code)
         # Czech quotes should be converted
         assert "Ahoj" in result
 
     def test_transpile_consecutive_decimals(self):
         """Test handling of multiple consecutive decimal transformations."""
-        code = "a = 1,1\nb = 2,2\nc = 3,3"
+        code = "A = 1,1\nB = 2,2\nC = 3,3"
         result = transpile(code)
         assert "1.1" in result
         assert "2.2" in result
@@ -303,7 +303,7 @@ class TestTranspileEdgeCases:
 
     def test_transpile_nested_structures(self):
         """Test transpilation of deeply nested structures."""
-        code = "data = [[1; 2; [3; 4]]; [5; 6]]"
+        code = "Data = [[1; 2; [3; 4]]; [5; 6]]"
         result = transpile(code)
         # Check that semicolons are converted
         assert "[1,2,[3,4]]" in result.replace(" ", "")
