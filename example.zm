@@ -10,19 +10,19 @@ pokyn = „Zadej číslo"
 
 # podmínka
 právě když x > 0:
-    print(„x je kladné číslo")
+    vytiskni(„x je kladné číslo")
 jinkdyž x < 0:
-    print(„x je záporné číslo")
+    vytiskni(„x je záporné číslo")
 jinak:
-    print(„x je nula")
+    vytiskni(„x je nula")
 
 # smyčka for
 pro i v [1, 2, 3]:
-    print(„číslo v seznamu:", i)
+    vytiskni(„číslo v seznamu:", i)
 
 # smyčka while
 při x < 5:
-    print(„x =", x)
+    vytiskni(„x =", x)
     x = x + 1
 
 # definice třídy
@@ -40,9 +40,9 @@ dovézt sys
 zkus:
     výsledek = 10 / 0
 kromě:
-    print(„Chyba při dělení")
+    vytiskni(„Chyba při dělení")
 konečně:
-    print(„Konec bloku zkus")
+    vytiskni(„Konec bloku zkus")
 
 # return
 def sečti(a, b):

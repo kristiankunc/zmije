@@ -31,4 +31,5 @@ KEYWORD_MAP = {
     ("při",): "while",
     ("s",): "with",
     ("vynes",): "yield",
+    ("vytiskni",): "print",
 }
