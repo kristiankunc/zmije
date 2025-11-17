@@ -108,6 +108,19 @@ def replace_decimal_separator(tokens):
     
     return output
 
+def replace_list_separators(tokens):
+    """Replace ; with , for list separators to avoid confusion with floats"""
+    output = []
+    for tok in tokens:
+        if tok.type == tokenize.OP and tok.string == ";":
+            # Replace semicolon with comma for list/function argument separation
+            new_tok = tok._replace(string=",")
+            output.append(new_tok)
+        else:
+            output.append(tok)
+    
+    return output
+
 def transpile(code):
     """
     Transpile Czech code to Python with safety checks.
@@ -116,6 +129,7 @@ def transpile(code):
     1. Czech keywords to English keywords
     2. Decimal separator: , to .
     3. Czech quotes: „...‟ to "..."
+    4. List separators: ; to ,
     """
     try:
         # Pre-process: Replace Czech quotes with regular quotes for tokenization
@@ -127,6 +141,7 @@ def transpile(code):
         # Apply transformations
         rewritten = rewrite_tokens(tokens)
         rewritten = replace_decimal_separator(rewritten)
+        rewritten = replace_list_separators(rewritten)
         
         # Generate output
         result = tokenize.untokenize(rewritten)
