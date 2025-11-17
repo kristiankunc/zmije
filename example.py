@@ -8,7 +8,18 @@ průměr = 3.14
 zpráva = "Ahoj světe"
 pokyn = "Zadej číslo"
 
-# podmínka
+# Seznamy se středníky jako oddělovače
+seznam = [1, 2, 3, 4, 5]
+vnořený_seznam = [[1, 2], [3, 4], [5, 6]]
+
+# Slovníky se složitými hodnotami
+slovník = {"jméno": "Karel", "věk": 30, "město": "Praha"}
+data = {"seznam": [1, 2, 3], "vnorený": {"a": 1, "b": 2}}
+
+# Funkce s více argumenty
+print("Hodnoty:", 1, 2, 3, 4)
+
+# Podmínka
 if      x > 0:
     print("x je kladné číslo")
 elif x < 0:
@@ -16,16 +27,16 @@ elif x < 0:
 else:
     print("x je nula")
 
-# smyčka for
+# Smyčka for se seznamem
 for i in [1, 2, 3]:
     print("číslo v seznamu:", i)
 
-# smyčka while
+# Smyčka while
 while x < 5:
     print("x =", x)
     x = x + 1
 
-# definice třídy
+# Definice třídy
 class Zvire:
     def __init__(self, jméno):
         self.jméno = jméno
@@ -33,32 +44,33 @@ class Zvire:
     def zvuk(self):
         pass
 
-# import
+# Import
 import sys
 
-# try-except
+# Try-except s více argumenty
 try:
     výsledek = 10 / 0
+    matice = [[1, 2], [3, 4]]
 except:
     print("Chyba při dělení")
 finally:
     print("Konec bloku zkus")
 
-# return
+# Return
 def sečti(a, b):
     return a + b
 
-# with statement
+# With statement
 with open("soubor.txt") as f:
     obsah = f.read()
 
-# yield
+# Yield
 def generátor():
     yield 1
     yield 2
 
-# delete
+# Delete
 del x
 
-# raise
+# Raise
 raise ValueError("Neplatná hodnota")

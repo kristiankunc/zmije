@@ -121,9 +121,32 @@ def replace_list_separators(tokens):
     
     return output
 
+def validate_no_english_keywords(code):
+    """
+    Validate that the source code does not contain English keywords that have Czech translations.
+    Raises ValueError if English keywords are found.
+    """
+    # Extract all English keywords (values from KEYWORD_MAP)
+    english_keywords = set(value for value in KEYWORD_MAP.values())
+    
+    # Tokenize the code to check for NAME tokens
+    code_normalized = code.replace('„', '"').replace('‟', '"')
+    tokens = list(tokenize.generate_tokens(io.StringIO(code_normalized).readline))
+    
+    for tok in tokens:
+        if tok.type == tokenize.NAME and tok.string in english_keywords:
+            raise ValueError(
+                f"Found English keyword '{tok.string}' at line {tok.start[0]}, column {tok.start[1]}. "
+                f"This keyword has a Czech translation. Use the Czech version instead. "
+                f"Source code should be written entirely in Czech."
+            )
+
 def transpile(code):
     """
     Transpile Czech code to Python with safety checks.
+    
+    Validations:
+    1. No English keywords should be used (source must be pure Czech)
     
     Transformations:
     1. Czech keywords to English keywords
@@ -132,6 +155,9 @@ def transpile(code):
     4. List separators: ; to ,
     """
     try:
+        # Validate that no English keywords are used
+        validate_no_english_keywords(code)
+        
         # Pre-process: Replace Czech quotes with regular quotes for tokenization
         code_normalized = code.replace('„', '"').replace('‟', '"')
         
@@ -155,6 +181,9 @@ def transpile(code):
         
         return result
     
+    except ValueError as e:
+        print(f"Validation Error: {e}")
+        raise
     except tokenize.TokenError as e:
         print(f"Error: Failed to tokenize code: {e}")
         raise
