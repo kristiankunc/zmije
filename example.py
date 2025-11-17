@@ -1,45 +1,45 @@
 # Příklad kódu s českými klíčovými slovy
 
-x = 0
-výraz = True
-počet = None
-cena = 19.99   
-průměr = 3.14   
-zpráva = "Ahoj světe"
-pokyn = "Zadej číslo"
+X = 0
+Výraz = True
+Počet = None
+Cena = 19.99   
+Průměr = 3.14   
+Zpráva = "Ahoj světe"
+Pokyn = "Zadej číslo"
 
 # Seznamy se středníky jako oddělovače
-seznam = [1, 2, 3, 4, 5]
-vnořený_seznam = [[1, 2], [3, 4], [5, 6]]
+Seznam = [1, 2, 3, 4, 5]
+Vnořený_seznam = [[1, 2], [3, 4], [5, 6]]
 
 # Slovníky se složitými hodnotami
-slovník = {"jméno": "Karel", "věk": 30, "město": "Praha"}
-data = {"seznam": [1, 2, 3], "vnorený": {"a": 1, "b": 2}}
+Slovník = {"jméno": "Karel", "věk": 30, "město": "Praha"}
+Data = {"seznam": [1, 2, 3], "vnorený": {"a": 1, "b": 2}}
 
 # Funkce s více argumenty
 print("Hodnoty:", 1, 2, 3, 4)
 
 # Podmínka
-if      x > 0:
+if X > 0:
     print("x je kladné číslo")
-elif x < 0:
+elif X < 0:
     print("x je záporné číslo")
 else:
     print("x je nula")
 
 # Smyčka for se seznamem
-for i in [1, 2, 3]:
-    print("číslo v seznamu:", i)
+for I in [1, 2, 3]:
+    print("číslo v seznamu:", I)
 
 # Smyčka while
-while x < 5:
-    print("x =", x)
-    x = x + 1
+while X < 5:
+    print("x =", X)
+    X = X + 1
 
 # Definice třídy
 class Zvire:
-    def __init__(self, jméno):
-        self.jméno = jméno
+    def __init__(self, Jméno):
+        self.Jméno = Jméno
     
     def zvuk(self):
         pass
@@ -49,20 +49,20 @@ import sys
 
 # Try-except s více argumenty
 try:
-    výsledek = 10 / 0
-    matice = [[1, 2], [3, 4]]
+    Výsledek = 10 / 0
+    Matice = [[1, 2], [3, 4]]
 except:
     print("Chyba při dělení")
 finally:
     print("Konec bloku zkus")
 
 # Return
-def sečti(a, b):
-    return a + b
+def sečti(A, B):
+    return A + B
 
 # With statement
-with open("soubor.txt") as f:
-    obsah = f.read()
+with open("soubor.txt") as F:
+    Obsah = F.read()
 
 # Yield
 def generátor():
@@ -70,7 +70,7 @@ def generátor():
     yield 2
 
 # Delete
-del x
+del X
 
 # Raise
 raise ValueError("Neplatná hodnota")

@@ -1,45 +1,45 @@
 # Příklad kódu s českými klíčovými slovy
 
-x = 0
-výraz = Pravda
-počet = Nic
-cena = 19,99
-průměr = 3,14
-zpráva = „Ahoj světe"
-pokyn = „Zadej číslo"
+X = 0
+Výraz = Pravda
+Počet = Nic
+Cena = 19,99
+Průměr = 3,14
+Zpráva = „Ahoj světe"
+Pokyn = „Zadej číslo"
 
 # Seznamy se středníky jako oddělovače
-seznam = [1; 2; 3; 4; 5]
-vnořený_seznam = [[1; 2]; [3; 4]; [5; 6]]
+Seznam = [1; 2; 3; 4; 5]
+Vnořený_seznam = [[1; 2]; [3; 4]; [5; 6]]
 
 # Slovníky se složitými hodnotami
-slovník = {„jméno": „Karel"; „věk": 30; „město": „Praha"}
-data = {„seznam": [1; 2; 3]; „vnorený": {„a": 1; „b": 2}}
+Slovník = {„jméno": „Karel"; „věk": 30; „město": „Praha"}
+Data = {„seznam": [1; 2; 3]; „vnorený": {„a": 1; „b": 2}}
 
 # Funkce s více argumenty
 vytiskni(„Hodnoty:"; 1; 2; 3; 4)
 
 # Podmínka
-když x > 0:
+když X > 0:
     vytiskni(„x je kladné číslo")
-jinkdyž x < 0:
+jinkdyž X < 0:
     vytiskni(„x je záporné číslo")
 jinak:
     vytiskni(„x je nula")
 
 # Smyčka for se seznamem
-pro i v [1; 2; 3]:
-    vytiskni(„číslo v seznamu:"; i)
+pro I v [1; 2; 3]:
+    vytiskni(„číslo v seznamu:"; I)
 
 # Smyčka while
-při x < 5:
-    vytiskni(„x ="; x)
-    x = x + 1
+při X < 5:
+    vytiskni(„x ="; X)
+    X = X + 1
 
 # Definice třídy
 klasa Zvire:
-    def __init__(self; jméno):
-        self.jméno = jméno
+    def __init__(self; Jméno):
+        self.Jméno = Jméno
     
     def zvuk(self):
         přejdi
@@ -49,20 +49,20 @@ dovézt sys
 
 # Try-except s více argumenty
 zkus:
-    výsledek = 10 / 0
-    matice = [[1; 2]; [3; 4]]
+    Výsledek = 10 / 0
+    Matice = [[1; 2]; [3; 4]]
 kromě:
     vytiskni(„Chyba při dělení")
 konečně:
     vytiskni(„Konec bloku zkus")
 
 # Return
-def sečti(a; b):
-    vrať a + b
+def sečti(A; B):
+    vrať A + B
 
 # With statement
-s open(„soubor.txt") jako f:
-    obsah = f.read()
+s open(„soubor.txt") jako F:
+    Obsah = F.read()
 
 # Yield
 def generátor():
@@ -70,7 +70,7 @@ def generátor():
     vynes 2
 
 # Delete
-smaž x
+smaž X
 
 # Raise
 povznes ValueError(„Neplatná hodnota")
