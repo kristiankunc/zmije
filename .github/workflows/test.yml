@@ -1,0 +1,27 @@
+name: Testy
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Nastavit Python 3.11
+              uses: actions/setup-python@v2
+              with:
+                  python-version: "3.11"
+
+            - name: Instaluj závislosti
+              run: |
+                  pip install -e .
+                  pip install .[dev]
+
+            - name: Spusť testy
+              run: |
+                  pytest
