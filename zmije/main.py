@@ -4,288 +4,224 @@ import keyword
 
 from zmije.internal.data import KEYWORD_MAP
 
-# Keywords that are often used as variable names or are ambiguous
-AMBIGUOUS_KEYWORDS = {("a",)}
+NEJEDNOZNACNA_KLICOVA_SLOVA = {("a",)}
 
-def rewrite_tokens(tokens):
-    buffer = []
-    output = []
-    paren_depth = 0  # Track parentheses depth
-    after_def = False  # Track if we just saw 'def'
-    in_def_parens = False  # Track if we're inside def() parameters
-    after_dot = False  # Track if we just saw '.'
+def prepis_tokeny(tokeny):
+    vyrovnavaci_pamet = []
+    vystup = []
+    hloubka_zavorek = 0
+    po_def = False
+    v_def_zavorkach = False
+    po_tecce = False
 
-    for tok in tokens:
-        # Track context
+    for tok in tokeny:
         if tok.type == tokenize.NAME and tok.string == "def":
-            after_def = True
-            in_def_parens = False
+            po_def = True
+            v_def_zavorkach = False
         
         if tok.type == tokenize.OP:
             if tok.string == "(":
-                if after_def:
-                    in_def_parens = True
-                paren_depth += 1
+                if po_def:
+                    v_def_zavorkach = True
+                hloubka_zavorek += 1
             elif tok.string == ")":
-                paren_depth -= 1
-                if paren_depth == 0 and after_def:
-                    in_def_parens = False
-                    after_def = False
+                hloubka_zavorek -= 1
+                if hloubka_zavorek == 0 and po_def:
+                    v_def_zavorkach = False
+                    po_def = False
             elif tok.string == ".":
-                after_dot = True
+                po_tecce = True
             elif tok.string not in (",", " "):
-                after_dot = False
+                po_tecce = False
         
         if tok.type == tokenize.NAME:
-            buffer.append(tok)
+            vyrovnavaci_pamet.append(tok)
             
-            # Check if we should replace this sequence
-            should_replace = True
+            mel_nahradit = True
             
-            # Don't replace if we're in function parameters
-            if in_def_parens:
-                should_replace = False
+            if v_def_zavorkach:
+                mel_nahradit = False
             
-            # Don't replace if this is an attribute name (after a dot)
-            if after_dot:
-                should_replace = False
-                after_dot = False
+            if po_tecce:
+                mel_nahradit = False
+                po_tecce = False
             
-            # Don't replace ambiguous keywords (could be variable names)
-            if should_replace:
-                for keyword in AMBIGUOUS_KEYWORDS:
-                    if len(buffer) >= len(keyword) and [t.string.lower() for t in buffer[-len(keyword):]] == [k.lower() for k in keyword]:
-                        should_replace = False
+            if mel_nahradit:
+                for klicove_slovo in NEJEDNOZNACNA_KLICOVA_SLOVA:
+                    if len(vyrovnavaci_pamet) >= len(klicove_slovo) and [t.string.lower() for t in vyrovnavaci_pamet[-len(klicove_slovo):]] == [k.lower() for k in klicove_slovo]:
+                        mel_nahradit = False
                         break
             
-            if should_replace:
-                # try matching multi-word sequences (longest first)
-                for seq in sorted(KEYWORD_MAP.keys(), key=len, reverse=True):
-                    if len(buffer) >= len(seq):
-                        window = buffer[-len(seq):]
-                        # Case-insensitive comparison
-                        if [t.string.lower() for t in window] == [k.lower() for k in seq]:
-                            # Replace all tokens in the sequence with the first one containing the replacement
-                            # Preserve the original casing for the first character
-                            replacement = KEYWORD_MAP[seq]
-                            new = window[0]._replace(string=replacement)
-                            buffer = buffer[:-len(seq)] + [new]
+            if mel_nahradit:
+                for sekvence in sorted(KEYWORD_MAP.keys(), key=len, reverse=True):
+                    if len(vyrovnavaci_pamet) >= len(sekvence):
+                        okno = vyrovnavaci_pamet[-len(sekvence):]
+                        if [t.string.lower() for t in okno] == [k.lower() for k in sekvence]:
+                            nahrady = KEYWORD_MAP[sekvence]
+                            novy = okno[0]._replace(string=nahrady)
+                            vyrovnavaci_pamet = vyrovnavaci_pamet[:-len(sekvence)] + [novy]
                             break
             continue
 
-        # whenever a non-NAME arrives, flush everything
-        while buffer:
-            output.append(buffer.pop(0))
-        output.append(tok)
+        while vyrovnavaci_pamet:
+            vystup.append(vyrovnavaci_pamet.pop(0))
+        vystup.append(tok)
 
-    # flush at end
-    while buffer:
-        output.append(buffer.pop(0))
+    while vyrovnavaci_pamet:
+        vystup.append(vyrovnavaci_pamet.pop(0))
     
-    return output
+    return vystup
 
-def replace_decimal_separator(tokens):
-    """Replace , with . in decimal numbers"""
-    output = []
+def nahrad_oddelovac_desetinnych(tokeny):
+    vystup = []
     i = 0
-    while i < len(tokens):
-        tok = tokens[i]
+    while i < len(tokeny):
+        tok = tokeny[i]
         
-        # Check if this is a NUMBER token followed by a comma and another number
-        if tok.type == tokenize.NUMBER and i + 2 < len(tokens):
-            next_tok = tokens[i + 1]
-            next_next_tok = tokens[i + 2]
+        if tok.type == tokenize.NUMBER and i + 2 < len(tokeny):
+            dalsi_tok = tokeny[i + 1]
+            dalsi_dalsi_tok = tokeny[i + 2]
             
-            # If we have: NUMBER , NUMBER, replace the comma with dot
-            if (next_tok.type == tokenize.OP and next_tok.string == "," and
-                next_next_tok.type == tokenize.NUMBER):
+            if (dalsi_tok.type == tokenize.OP and dalsi_tok.string == "," and
+                dalsi_dalsi_tok.type == tokenize.NUMBER):
                 
-                # Combine into a single NUMBER token with dot separator
-                combined_string = tok.string + "." + next_next_tok.string
-                new_tok = tok._replace(string=combined_string)
-                output.append(new_tok)
-                i += 3  # Skip the comma and next number token
+                kombinovany_retezec = tok.string + "." + dalsi_dalsi_tok.string
+                novy_tok = tok._replace(string=kombinovany_retezec)
+                vystup.append(novy_tok)
+                i += 3
                 continue
         
-        output.append(tok)
+        vystup.append(tok)
         i += 1
     
-    return output
+    return vystup
 
-def replace_list_separators(tokens):
-    """Replace ; with , for list separators to avoid confusion with floats"""
-    output = []
-    for tok in tokens:
+def nahrad_oddelovace_seznamu(tokeny):
+    vystup = []
+    for tok in tokeny:
         if tok.type == tokenize.OP and tok.string == ";":
-            # Replace semicolon with comma for list/function argument separation
-            new_tok = tok._replace(string=",")
-            output.append(new_tok)
+            novy_tok = tok._replace(string=",")
+            vystup.append(novy_tok)
         else:
-            output.append(tok)
+            vystup.append(tok)
     
-    return output
+    return vystup
 
-def validate_variables_capitalized(code):
-    """
-    Validate that all variables start with capital letters.
+def validuj_promenne_velkymi_pismeny(kod):
+    python_klicova_slova = set(keyword.kwlist)
     
-    Only checks variables being assigned (NAME = ...), not function definitions
-    or other uses of names. Excludes attribute assignments (obj.attr = ...).
-    """    
-    # Python keywords (def, if, for, etc.)
-    python_keywords = set(keyword.kwlist)
-    
-    # Czech keywords that will be transpiled to English
-    czech_keywords = set()
-    for key in KEYWORD_MAP.keys():
-        if isinstance(key, tuple):
-            czech_keywords.add(key[0])
+    ceska_klicova_slova = set()
+    for klic in KEYWORD_MAP.keys():
+        if isinstance(klic, tuple):
+            ceska_klicova_slova.add(klic[0])
         else:
-            czech_keywords.add(key)
+            ceska_klicova_slova.add(klic)
     
-    # Built-in functions and types
-    builtin_names = set(dir(__builtins__) if isinstance(__builtins__, dict) else dir(__builtins__))
+    vstavene_nazvy = set(dir(__builtins__) if isinstance(__builtins__, dict) else dir(__builtins__))
     
-    code_normalized = code.replace('„', '"').replace('‟', '"')
-    # Strip leading/trailing whitespace to normalize line numbers
-    code_normalized = code_normalized.strip()
+    kod_normalizovany = kod.replace('„', '"').replace('‟', '"')
+    kod_normalizovany = kod_normalizovany.strip()
     
     try:
-        tokens = list(tokenize.generate_tokens(io.StringIO(code_normalized).readline))
+        tokeny = list(tokenize.generate_tokens(io.StringIO(kod_normalizovany).readline))
     except tokenize.TokenError as e:
-        # Re-raise tokenization errors (e.g., invalid variable names)
-        raise ValueError(f"Invalid code: {e}")
+        raise ValueError(f"Neplatný kód: {e}")
     
-    # Check for invalid syntax patterns like NUMBER followed by NAME (but not a keyword)
     i = 0
-    while i < len(tokens) - 1:
-        tok = tokens[i]
-        next_tok = tokens[i + 1]
+    while i < len(tokeny) - 1:
+        tok = tokeny[i]
+        dalsi_tok = tokeny[i + 1]
         
-        # Check for NUMBER immediately followed by NAME (invalid Python)
-        # But exclude if the NAME is a keyword
-        if (tok.type == tokenize.NUMBER and next_tok.type == tokenize.NAME and
-            next_tok.string.lower() not in czech_keywords and
-            next_tok.string not in python_keywords):
+        if (tok.type == tokenize.NUMBER and dalsi_tok.type == tokenize.NAME and
+            dalsi_tok.string.lower() not in ceska_klicova_slova and
+            dalsi_tok.string not in python_klicova_slova):
             raise ValueError(
-                f"Invalid code: cannot have a number literal directly followed by a variable name "
-                f"at line {next_tok.start[0]}, column {next_tok.start[1]}"
+                f"Neplatný kód: nelze mít číselný literál bezprostředně následovaný jiným názvem proměnné "
+                f"na řádku {dalsi_tok.start[0]}, sloupci {dalsi_tok.start[1]}"
             )
         
         i += 1
     
-    # Look for variables being assigned: NAME = ...
     i = 0
-    while i < len(tokens):
-        tok = tokens[i]
+    while i < len(tokeny):
+        tok = tokeny[i]
         
-        # Check for assignment: NAME = ...
         if (tok.type == tokenize.NAME and 
-            i + 1 < len(tokens) and 
-            tokens[i + 1].type == tokenize.OP and 
-            tokens[i + 1].string == "="):
+            i + 1 < len(tokeny) and 
+            tokeny[i + 1].type == tokenize.OP and 
+            tokeny[i + 1].string == "="):
             
-            # Check if this is an attribute assignment (has a dot before it)
-            # Look back to see if there's a dot before this NAME
-            is_attribute = False
-            if i > 0 and tokens[i - 1].type == tokenize.OP and tokens[i - 1].string == ".":
-                is_attribute = True
+            je_atribut = False
+            if i > 0 and tokeny[i - 1].type == tokenize.OP and tokeny[i - 1].string == ".":
+                je_atribut = True
             
-            # Skip attribute assignments
-            if is_attribute:
+            if je_atribut:
                 i += 1
                 continue
             
-            # This is a variable assignment
-            var_name = tok.string
-            if (var_name not in python_keywords and
-                var_name not in czech_keywords and
-                var_name not in builtin_names and
-                var_name and
-                not var_name[0].isupper()):
+            nazev_promenne = tok.string
+            if (nazev_promenne not in python_klicova_slova and
+                nazev_promenne not in ceska_klicova_slova and
+                nazev_promenne not in vstavene_nazvy and
+                nazev_promenne and
+                not nazev_promenne[0].isupper()):
                 raise ValueError(
-                    f"Variable '{var_name}' at line {tok.start[0]}, column {tok.start[1]} "
-                    f"does not start with a capital letter. All variables must be capitalized."
+                    f"Proměnná '{nazev_promenne}' musí začínat velkým písmenem na řádku {tok.start[0]}, sloupci {tok.start[1]}"
                 )
         
         i += 1
 
-def validate_no_english_keywords(code):
-    """
-    Validate that the source code does not contain English keywords that have Czech translations.
-    Raises ValueError if English keywords are found.
-    """
-    # Extract all English keywords (values from KEYWORD_MAP)
-    english_keywords = set(value for value in KEYWORD_MAP.values())
+def validuj_zadna_anglicka_klicova_slova(kod):
+    anglicka_klicova_slova = set(value for value in KEYWORD_MAP.values())
     
-    # Tokenize the code to check for NAME tokens
-    code_normalized = code.replace('„', '"').replace('‟', '"')
-    tokens = list(tokenize.generate_tokens(io.StringIO(code_normalized).readline))
+    kod_normalizovany = kod.replace('„', '"').replace('‟', '"')
+    tokeny = list(tokenize.generate_tokens(io.StringIO(kod_normalizovany).readline))
     
-    for tok in tokens:
-        if tok.type == tokenize.NAME and tok.string in english_keywords:
+    for tok in tokeny:
+        if tok.type == tokenize.NAME and tok.string in anglicka_klicova_slova:
             raise ValueError(
-                f"Found English keyword '{tok.string}' at line {tok.start[0]}, column {tok.start[1]}. "
-                f"This keyword has a Czech translation. Use the Czech version instead. "
-                f"Source code should be written entirely in Czech."
+                f"Nalezeno anglické klíčové slovo '{tok.string}' na řádku {tok.start[0]}, sloupci {tok.start[1]}. "
+                f"Toto klíčové slovo má český překlad. Použijte českou verzi. "
+                f"Zdrojový kód by měl být psán vždy v češtině vole."
             )
 
-def transpile(code):
-    """
-    Transpile Czech code to Python with safety checks.
-    
-    Transformations:
-    1. Czech keywords to English keywords
-    2. Decimal separator: , to .
-    3. Czech quotes: „...‟ to "..."
-    4. List separators: ; to ,
-    """
+def transpiluj(kod):
     try:
-        # Validate that all variables are capitalized
-        validate_variables_capitalized(code)
+        validuj_promenne_velkymi_pismeny(kod)
         
-        # Validate that no English keywords are used
-        validate_no_english_keywords(code)
+        validuj_zadna_anglicka_klicova_slova(kod)
         
-        # Pre-process: Replace Czech quotes with regular quotes for tokenization
-        code_normalized = code.replace('„', '"').replace('‟', '"')
+        kod_normalizovany = kod.replace('„', '"').replace('‟', '"')
         
-        # Validate the normalized code can be tokenized
-        tokens = list(tokenize.generate_tokens(io.StringIO(code_normalized).readline))
+        tokeny = list(tokenize.generate_tokens(io.StringIO(kod_normalizovany).readline))
         
-        # Apply transformations
-        rewritten = rewrite_tokens(tokens)
-        rewritten = replace_decimal_separator(rewritten)
-        rewritten = replace_list_separators(rewritten)
+        prepisane = prepis_tokeny(tokeny)
+        prepisane = nahrad_oddelovac_desetinnych(prepisane)
+        prepisane = nahrad_oddelovace_seznamu(prepisane)
         
-        # Generate output
-        result = tokenize.untokenize(rewritten)
+        vysledek = tokenize.untokenize(prepisane)
         
-        # Safety check: Ensure output is valid Python by attempting to compile
         try:
-            compile(result, '<transpiled>', 'exec')
+            compile(vysledek, '<transpiluj>', 'exec')
         except SyntaxError as e:
-            print(f"Warning: Transpiled code may have syntax errors: {e}")
-            print(f"Line {e.lineno}: {e.text}")
+            print(f"Varování: Transpiliovaný kód může obsahovat chyby v syntaxi: {e}")
+            print(f"Řádek {e.lineno}: {e.text}")
         
-        return result
+        return vysledek
     
     except ValueError as e:
-        # Re-raise without printing to avoid encoding issues
         raise
     except tokenize.TokenError as e:
-        print(f"Error: Failed to tokenize code: {e}")
+        print(f"Chyba: Selhalo tokenizování kódu: {e}")
         raise
     except Exception as e:
-        print(f"Error during transpilation: {e}")
+        print(f"Chyba při tlumočení: {e}")
         raise
 
 if __name__ == "__main__":
     with open("example.zm", "r", encoding="utf-8") as f:
-        source_code = f.read()
+        zdrojovy_kod = f.read()
 
-    transpiled_code = transpile(source_code)
+    transpiliovany_kod = transpiluj(zdrojovy_kod)
     with open("example.py", "w", encoding="utf-8") as f:
-        f.write(transpiled_code)
-
-
+        f.write(transpiliovany_kod)

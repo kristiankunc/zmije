@@ -2,13 +2,13 @@
 
 import pytest
 import tempfile
-from zmije.main import transpile
+from zmije.main import transpiluj
 
 
 class TestIntegration:
     """Integration tests for complete transpilation workflows."""
 
-    def test_transpile_complete_czech_program(self):
+    def test_transpiluj_complete_czech_program(self):
         """Test transpilation of a complete Czech program."""
         code = """# Český program
 klasa Osoba:
@@ -32,7 +32,7 @@ def Hlavní():
 
 Hlavní()
 """
-        result = transpile(code)
+        result = transpiluj(code)
         
         # Verify key transformations
         assert "class" in result
@@ -44,7 +44,7 @@ Hlavní()
         assert "if" in result
         assert "print" in result
 
-    def test_transpile_mathematical_expressions(self):
+    def test_transpiluj_mathematical_expressions(self):
         """Test transpilation with mathematical expressions and decimals."""
         code = """Výsledek = 1,5 + 2,7
 Průměr = (5,3 + 10,7) / 2
@@ -52,7 +52,7 @@ Maximální = 99,99
 Minimální = 0,01
 Součin = 3,14 * 2,0"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         # Check decimals are converted
         assert "1.5" in result
@@ -64,7 +64,7 @@ Součin = 3,14 * 2,0"""
         assert "3.14" in result
         assert "2.0" in result
 
-    def test_transpile_control_flow(self):
+    def test_transpiluj_control_flow(self):
         """Test transpilation of various control flow statements."""
         code = """X = 0
 právě když X > 0:
@@ -82,7 +82,7 @@ pro I v [1; 2; 3]:
     pokud I == 2:
         rozbít
 """
-        result = transpile(code)
+        result = transpiluj(code)
         
         assert "if" in result
         assert "elif" in result
@@ -93,7 +93,7 @@ pro I v [1; 2; 3]:
         assert "in" in result
         assert "break" in result
 
-    def test_transpile_exception_handling(self):
+    def test_transpiluj_exception_handling(self):
         """Test transpilation of exception handling."""
         code = """zkus:
     Výsledek = 10 / 0
@@ -104,24 +104,24 @@ kromě:
 konečně:
     vytiskni("Hotovo")"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         assert "try" in result
         assert "except" in result
         assert "finally" in result
 
-    def test_transpile_import_statements(self):
+    def test_transpiluj_import_statements(self):
         """Test transpilation of import statements."""
         code = """dovézt sys
 od os dovézt path
 od collections dovézt defaultdict"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         assert "import" in result
         assert "from" in result or "import" in result
 
-    def test_transpile_nested_structures(self):
+    def test_transpiluj_nested_structures(self):
         """Test transpilation of nested data structures."""
         code = """Data = {
     „seznamy": [[1; 2]; [3; 4]];
@@ -129,7 +129,7 @@ od collections dovézt defaultdict"""
     „vnoření": {„a": 1; „b": 2,5}
 }"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         # Check for proper conversions
         assert "1.5" in result
@@ -137,7 +137,7 @@ od collections dovézt defaultdict"""
         assert "3.14" in result
         assert "2.5" in result
 
-    def test_transpile_function_definitions(self):
+    def test_transpiluj_function_definitions(self):
         """Test transpilation of various function definitions."""
         code = """def Sečti(A; B):
     vrať A + B
@@ -151,13 +151,13 @@ def Generátor():
     vynes 2
     vynes 3"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         assert "def" in result
         assert "return" in result
         assert "yield" in result
 
-    def test_transpile_with_file_operations(self):
+    def test_transpiluj_with_file_operations(self):
         """Test transpilation with file operations."""
         code = """s open("vstup.txt") jako Vstupní:
     Obsah = Vstupní.read()
@@ -165,26 +165,26 @@ def Generátor():
 s open("výstup.txt"; "w") jako Výstupní:
     Výstupní.write("data")"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         assert "with" in result
         assert "as" in result
         assert "open" in result
 
-    def test_transpile_logical_operators(self):
+    def test_transpiluj_logical_operators(self):
         """Test transpilation of logical operators."""
         code = """Podmínka1 = X > 0 a Y < 10
 Podmínka2 = Z == 5 nebo W != 0
 Podmínka3 = A je Nic
 Podmínka4 = Pravda a Lež"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         # 'a' as ambiguous keyword may not be replaced, but 'and'/'or'/'is' should be present
         assert "True" in result
         assert "False" in result or "Lež" in result
 
-    def test_transpile_complex_conditional(self):
+    def test_transpiluj_complex_conditional(self):
         """Test transpilation of complex conditional logic."""
         code = """právě když (X > 0 a X < 10) nebo (Y je Nic):
     vytiskni("podmínka splněna")
@@ -192,14 +192,14 @@ Podmínka4 = Pravda a Lež"""
 jinak:
     vytiskni("podmínka nesplněna")"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         assert "if" in result
         assert "del" in result
         assert "else" in result
 
-    def test_transpile_preserves_functionality(self):
-        """Test that transpiled code maintains functionality."""
+    def test_transpiluj_preserves_functionality(self):
+        """Test that transpilujd code maintains functionality."""
         code = """def Součet(N):
     Výsledek = 0
     pro I v range(N):
@@ -209,7 +209,7 @@ jinak:
 Odpověď = Součet(5)
 vytiskni(Odpověď)"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         # Verify code compiles
         try:
@@ -217,7 +217,7 @@ vytiskni(Odpověď)"""
         except SyntaxError as e:
             pytest.fail(f"Transpiled code has syntax error: {e}")
 
-    def test_transpile_file_to_file(self):
+    def test_transpiluj_file_to_file(self):
         """Test transpilation from file to file."""
         czech_code = """X = Pravda
 Y = 3,14
@@ -229,7 +229,7 @@ vytiskni(X; Y; Seznam)"""
             input_file = f.name
         
         try:
-            result = transpile(czech_code)
+            result = transpiluj(czech_code)
             assert "True" in result
             assert "3.14" in result
             assert "print" in result
@@ -237,7 +237,7 @@ vytiskni(X; Y; Seznam)"""
             import os
             os.unlink(input_file)
 
-    def test_transpile_comments_preserved(self):
+    def test_transpiluj_comments_preserved(self):
         """Test that comments are preserved during transpilation."""
         code = """# Inicializace
 X = 0  # Počáteční hodnota
@@ -247,28 +247,28 @@ při X < 5:
     vytiskni(X)  # Výpis hodnoty
     X = X + 1"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         # Comments should be preserved
         assert "#" in result
 
-    def test_transpile_mixed_czech_and_python(self):
+    def test_transpiluj_mixed_czech_and_python(self):
         """Test transpilation handles names that look like Python but are Czech variables."""
         code = """Počet_iterací = 10
 For_cyklus = 5
 Funkce_return = 42"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
-        # These should not be transpiled as they're variable names, not keywords
+        # These should not be transpilujd as they're variable names, not keywords
         # The code should remain valid
         try:
             compile(result, '<test>', 'exec')
         except SyntaxError:
             pytest.fail("Code should compile successfully")
 
-    def test_transpile_output_is_valid_python(self):
-        """Test that all transpiled code is valid Python."""
+    def test_transpiluj_output_is_valid_python(self):
+        """Test that all transpilujd code is valid Python."""
         code = """klasa Test:
     def Metoda(self; Arg):
         když Arg je Nic:
@@ -276,12 +276,12 @@ Funkce_return = 42"""
         Seznam = [1,5; 2,7]
         vynes Seznam"""
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         # Should compile without errors
         compile(result, '<test>', 'exec')
 
-    def test_transpile_large_program(self):
+    def test_transpiluj_large_program(self):
         """Test transpilation of a larger program."""
         code = """# Větší program
 klasa Databáze:
@@ -309,7 +309,7 @@ pro I v range(10):
 vytiskni(Db.Počet_záznamů())
 """
         
-        result = transpile(code)
+        result = transpiluj(code)
         
         # Verify key elements are present
         assert "class" in result

@@ -2,11 +2,11 @@
 
 import tokenize
 import io
-from zmije.main import replace_list_separators
+from zmije.main import nahrad_oddelovace_seznamu
 
 
 class TestListSeparators:
-    """Tests for the replace_list_separators function."""
+    """Tests for the nahrad_oddelovace_seznamu function."""
 
     def _tokenize(self, code):
         """Helper to tokenize code."""
@@ -16,7 +16,7 @@ class TestListSeparators:
         """Test replacement of semicolon with comma."""
         code = "a; b"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         assert "," in result_str
         assert ";" not in result_str
@@ -25,7 +25,7 @@ class TestListSeparators:
         """Test list with semicolon separators."""
         code = "[1; 2; 3]"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         assert "[1,2,3]" in result_str.replace(" ", "")
 
@@ -33,7 +33,7 @@ class TestListSeparators:
         """Test dictionary with semicolon separators."""
         code = '{"a": 1; "b": 2}'
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         # Check that semicolon is converted to comma
         assert "," in result_str
@@ -42,7 +42,7 @@ class TestListSeparators:
         """Test multiple semicolon replacements."""
         code = "[1; 2; 3; 4; 5]"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         # All semicolons should be replaced
         assert ";" not in result_str
@@ -52,7 +52,7 @@ class TestListSeparators:
         """Test semicolon replacement in function arguments."""
         code = "func(a; b; c)"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         assert ";" not in result_str
 
@@ -60,7 +60,7 @@ class TestListSeparators:
         """Test nested lists with semicolons."""
         code = "[[1; 2]; [3; 4]]"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         assert ";" not in result_str
 
@@ -68,7 +68,7 @@ class TestListSeparators:
         """Test that existing commas are preserved while semicolons are replaced."""
         code = "[1, 2; 3, 4]"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         # Original commas should be preserved, semicolon replaced
         assert "," in result_str
@@ -77,7 +77,7 @@ class TestListSeparators:
         """Test semicolon replacement in tuple."""
         code = "(1; 2; 3)"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         assert ";" not in result_str
 
@@ -85,7 +85,7 @@ class TestListSeparators:
         """Test that operators are preserved."""
         code = "x = 1 + 2; y = 3 * 4"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         assert "+" in result_str
         assert "*" in result_str
@@ -94,7 +94,7 @@ class TestListSeparators:
         """Test that semicolons inside strings would be preserved."""
         code = 'text = "1; 2; 3"'
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         # The string content should be unchanged
         assert "text" in result_str
@@ -103,7 +103,7 @@ class TestListSeparators:
         """Test that function returns a list of tokens."""
         code = "a; b"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         assert isinstance(result, list)
         assert len(result) > 0
 
@@ -111,7 +111,7 @@ class TestListSeparators:
         """Test that returned tokens have expected attributes."""
         code = "a; b"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         for token in result:
             assert hasattr(token, 'type')
             assert hasattr(token, 'string')
@@ -120,7 +120,7 @@ class TestListSeparators:
         """Test complex data structures with multiple semicolons."""
         code = 'data = {"list": [1; 2; 3]; "value": 42; "nested": {"a": 1; "b": 2}}'
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         # All semicolons should be replaced
         assert ";" not in result_str
@@ -129,7 +129,7 @@ class TestListSeparators:
         """Test that semicolons in comments are replaced (as they're not special in comments)."""
         code = "x = 1  # comment; with semicolon\ny = 2"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         # The function processes all OP tokens, including in comments
         assert len(result) > 0
 
@@ -137,7 +137,7 @@ class TestListSeparators:
         """Test function call with multiple semicolon-separated arguments."""
         code = "vytiskni(a; b; c; d)"
         tokens = self._tokenize(code)
-        result = replace_list_separators(tokens)
+        result = nahrad_oddelovace_seznamu(tokens)
         result_str = tokenize.untokenize(result)
         # Should have commas instead of semicolons
         assert result_str.count(",") >= 3

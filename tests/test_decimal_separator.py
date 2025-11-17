@@ -2,11 +2,11 @@
 
 import tokenize
 import io
-from zmije.main import replace_decimal_separator
+from zmije.main import nahrad_oddelovac_desetinnych
 
 
 class TestDecimalSeparator:
-    """Tests for the replace_decimal_separator function."""
+    """Tests for the nahrad_oddelovac_desetinnych function."""
 
     def _tokenize(self, code):
         """Helper to tokenize code."""
@@ -16,7 +16,7 @@ class TestDecimalSeparator:
         """Test conversion of simple decimal with comma."""
         code = "3,14"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "3.14" in result_str
         assert "3,14" not in result_str
@@ -25,7 +25,7 @@ class TestDecimalSeparator:
         """Test conversion of decimal starting with zero."""
         code = "0,5"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "0.5" in result_str
 
@@ -33,7 +33,7 @@ class TestDecimalSeparator:
         """Test conversion of larger decimal number."""
         code = "123,456"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "123.456" in result_str
 
@@ -41,7 +41,7 @@ class TestDecimalSeparator:
         """Test conversion of multiple decimal numbers."""
         code = "1,5 + 2,7"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "1.5" in result_str
         assert "2.7" in result_str
@@ -50,7 +50,7 @@ class TestDecimalSeparator:
         """Test decimal conversion in variable assignment."""
         code = "x = 3,14"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "3.14" in result_str
 
@@ -58,7 +58,7 @@ class TestDecimalSeparator:
         """Test decimal conversion in function arguments."""
         code = "func(1,5; 2,7)"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "1.5" in result_str
         assert "2.7" in result_str
@@ -67,7 +67,7 @@ class TestDecimalSeparator:
         """Test decimal conversion inside lists."""
         code = "[1,5; 2,7; 3,14]"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "1.5" in result_str
         assert "2.7" in result_str
@@ -77,7 +77,7 @@ class TestDecimalSeparator:
         """Test decimal conversion in dictionary values."""
         code = '{"price": 19,99}'
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "19.99" in result_str
 
@@ -85,7 +85,7 @@ class TestDecimalSeparator:
         """Test that commas not used as decimal separators are preserved."""
         code = "func(a, b, c)"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         # Commas between identifiers should not be converted
         # This test verifies non-decimal commas are not affected
         assert result is not None
@@ -94,7 +94,7 @@ class TestDecimalSeparator:
         """Test decimal conversion in arithmetic expressions."""
         code = "result = 10,5 * 2,3 + 1,1"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "10.5" in result_str
         assert "2.3" in result_str
@@ -104,7 +104,7 @@ class TestDecimalSeparator:
         """Test decimal conversion in comparisons."""
         code = "if x > 3,14:"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "3.14" in result_str
 
@@ -112,7 +112,7 @@ class TestDecimalSeparator:
         """Test conversion of very small decimal."""
         code = "0,00001"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "0.00001" in result_str
 
@@ -120,7 +120,7 @@ class TestDecimalSeparator:
         """Test decimal with many digits before separator."""
         code = "1234,5678"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "1234.5678" in result_str
 
@@ -128,7 +128,7 @@ class TestDecimalSeparator:
         """Test multiple consecutive decimal conversions."""
         code = "a = 1,1\nb = 2,2\nc = 3,3"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "1.1" in result_str
         assert "2.2" in result_str
@@ -138,7 +138,7 @@ class TestDecimalSeparator:
         """Test decimal number at end of line."""
         code = "value = 9,99"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "9.99" in result_str
 
@@ -146,7 +146,7 @@ class TestDecimalSeparator:
         """Test decimal number at start of line (after newline)."""
         code = "x = 1\n3,14"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "3.14" in result_str
 
@@ -154,7 +154,7 @@ class TestDecimalSeparator:
         """Test that function returns a list of tokens."""
         code = "3,14"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         assert isinstance(result, list)
         assert len(result) > 0
 
@@ -162,7 +162,7 @@ class TestDecimalSeparator:
         """Test that returned tokens have expected attributes."""
         code = "3,14"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         for token in result:
             assert hasattr(token, 'type')
             assert hasattr(token, 'string')
@@ -171,7 +171,7 @@ class TestDecimalSeparator:
         """Test nested decimal expressions."""
         code = "((1,5 + 2,7) * 3,14)"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         assert "1.5" in result_str
         assert "2.7" in result_str
@@ -181,7 +181,7 @@ class TestDecimalSeparator:
         """Test decimal with negative sign."""
         code = "-3,14"
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         # The negative sign should be separate, decimal conversion should still work
         assert "3.14" in result_str
@@ -190,7 +190,7 @@ class TestDecimalSeparator:
         """Test that non-decimal content is preserved."""
         code = 'text = "3,14 je pi"'
         tokens = self._tokenize(code)
-        result = replace_decimal_separator(tokens)
+        result = nahrad_oddelovac_desetinnych(tokens)
         result_str = tokenize.untokenize(result)
         # String content should be preserved as-is
         assert "text" in result_str

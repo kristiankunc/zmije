@@ -1,7 +1,7 @@
-from zmije.main import transpile
+from zmije.main import transpiluj
 import sys
 
-def main():
+def hlavni():
     
     if len(sys.argv) == 2 and sys.argv[1] == "--pomoc":
         print("""
@@ -17,41 +17,40 @@ Příkazy:
         
         sys.exit(1)
 
-    source_file = None
-    output_file = None
+    SouborZdroje = None
+    SouborVystupu = None
 
-    args = sys.argv[1:]
+    argumenty = sys.argv[1:]
     i = 0
 
-    while i < len(args):
-        arg = args[i]
-        if arg == "-o" and i + 1 < len(args):
-            output_file = args[i + 1]
+    while i < len(argumenty):
+        arg = argumenty[i]
+        if arg == "-o" and i + 1 < len(argumenty):
+            SouborVystupu = argumenty[i + 1]
             i += 2
         else:
-            source_file = arg
+            SouborZdroje = arg
             i += 1
 
-    if not source_file:
+    if not SouborZdroje:
         print("Chabička se vloudila: Chybí soubor se zdrojovým kódem.")
         sys.exit(1)
 
-    with open(source_file, "r", encoding="utf-8") as f:
-        source_code = f.read()
+    with open(SouborZdroje, "r", encoding="utf-8") as f:
+        KodZdroje = f.read()
 
-    transpiled_code = transpile(source_code)
+    PrepisujtecKod = transpiluj(KodZdroje)
 
-    if output_file:
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(transpiled_code)
+    if SouborVystupu:
+        with open(SouborVystupu, "w", encoding="utf-8") as f:
+            f.write(PrepisujtecKod)
     
-        print(f"Přetlumočený kód byl uložen do {output_file}.")
+        print(f"Přetlumočený kód byl uložen do {SouborVystupu}.")
 
     else:
-        print(transpiled_code)
+        print(PrepisujtecKod)
 
-    
 
 
 if __name__ == "__main__":
-    main()
+    hlavni()
