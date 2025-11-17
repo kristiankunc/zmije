@@ -10,7 +10,7 @@ KEYWORD_MAP = {
     ("rozbít",): "break",
     ("klasa",): "class",
     ("pokračovat",): "continue",
-    ("smaz",): "del",
+    ("smaž",): "del",
     ("jinkdyž",): "elif",
     ("jinak",): "else",
     ("kromě",): "except",

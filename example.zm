@@ -58,7 +58,7 @@ def generátor():
     vynes 2
 
 # delete
-smaz x
+smaž x
 
 # raise
 povznes ValueError(„Neplatná hodnota")
