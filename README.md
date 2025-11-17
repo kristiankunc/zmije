@@ -20,6 +20,14 @@ Pro další příklady a podrobnosti o syntaxi se jukněte do souboru [example.z
 
 ## Důležitá pravidla
 
+### Velká písmena
+
+Všechny vlastní jména (názvy proměnných) musí začínat velkým písmenem. Například:
+
+```zmije
+Správná_proměnná = 42
+```
+
 ### Přímá řeč
 
 Pokud chceme jakýkoliv text vypsat či uložit, musíme použít správné úvozovky. V češtině se používají „dolní“ a „horní“ uvozovky, které se liší od anglických "rovných" uvozovek. Například:

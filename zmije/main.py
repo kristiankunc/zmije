@@ -1,5 +1,6 @@
 import io
 import tokenize
+import keyword
 
 from zmije.internal.data import KEYWORD_MAP
 
@@ -53,7 +54,7 @@ def rewrite_tokens(tokens):
             # Don't replace ambiguous keywords (could be variable names)
             if should_replace:
                 for keyword in AMBIGUOUS_KEYWORDS:
-                    if len(buffer) >= len(keyword) and [t.string for t in buffer[-len(keyword):]] == list(keyword):
+                    if len(buffer) >= len(keyword) and [t.string.lower() for t in buffer[-len(keyword):]] == [k.lower() for k in keyword]:
                         should_replace = False
                         break
             
@@ -62,9 +63,12 @@ def rewrite_tokens(tokens):
                 for seq in sorted(KEYWORD_MAP.keys(), key=len, reverse=True):
                     if len(buffer) >= len(seq):
                         window = buffer[-len(seq):]
-                        if [t.string for t in window] == list(seq):
+                        # Case-insensitive comparison
+                        if [t.string.lower() for t in window] == [k.lower() for k in seq]:
                             # Replace all tokens in the sequence with the first one containing the replacement
-                            new = window[0]._replace(string=KEYWORD_MAP[seq])
+                            # Preserve the original casing for the first character
+                            replacement = KEYWORD_MAP[seq]
+                            new = window[0]._replace(string=replacement)
                             buffer = buffer[:-len(seq)] + [new]
                             break
             continue
@@ -121,6 +125,80 @@ def replace_list_separators(tokens):
     
     return output
 
+def validate_variables_capitalized(code):
+    """
+    Validate that all variables start with capital letters.
+    
+    Only checks variables being assigned (NAME = ...), not function definitions
+    or other uses of names. Excludes attribute assignments (obj.attr = ...).
+    """    
+    # Python keywords (def, if, for, etc.)
+    python_keywords = set(keyword.kwlist)
+    
+    # Czech keywords that will be transpiled to English
+    czech_keywords = set()
+    for key in KEYWORD_MAP.keys():
+        if isinstance(key, tuple):
+            czech_keywords.add(key[0])
+        else:
+            czech_keywords.add(key)
+    
+    # Built-in functions and types
+    builtin_names = set(dir(__builtins__) if isinstance(__builtins__, dict) else dir(__builtins__))
+    
+    code_normalized = code.replace('„', '"').replace('‟', '"')
+    # Strip leading/trailing whitespace to normalize line numbers
+    code_normalized = code_normalized.strip()
+    
+    try:
+        tokens = list(tokenize.generate_tokens(io.StringIO(code_normalized).readline))
+    except tokenize.TokenError as e:
+        # Re-raise tokenization errors (e.g., invalid variable names)
+        raise ValueError(f"Invalid code: {e}")
+    
+    # Try to compile to catch syntax errors early
+    try:
+        compile(code_normalized, '<validate>', 'exec')
+    except SyntaxError as e:
+        # Raise as ValueError for consistency with validation errors
+        raise ValueError(f"Invalid code: {e}")
+    
+    # Look for variables being assigned: NAME = ...
+    i = 0
+    while i < len(tokens):
+        tok = tokens[i]
+        
+        # Check for assignment: NAME = ...
+        if (tok.type == tokenize.NAME and 
+            i + 1 < len(tokens) and 
+            tokens[i + 1].type == tokenize.OP and 
+            tokens[i + 1].string == "="):
+            
+            # Check if this is an attribute assignment (has a dot before it)
+            # Look back to see if there's a dot before this NAME
+            is_attribute = False
+            if i > 0 and tokens[i - 1].type == tokenize.OP and tokens[i - 1].string == ".":
+                is_attribute = True
+            
+            # Skip attribute assignments
+            if is_attribute:
+                i += 1
+                continue
+            
+            # This is a variable assignment
+            var_name = tok.string
+            if (var_name not in python_keywords and
+                var_name not in czech_keywords and
+                var_name not in builtin_names and
+                var_name and
+                not var_name[0].isupper()):
+                raise ValueError(
+                    f"Variable '{var_name}' at line {tok.start[0]}, column {tok.start[1]} "
+                    f"does not start with a capital letter. All variables must be capitalized."
+                )
+        
+        i += 1
+
 def validate_no_english_keywords(code):
     """
     Validate that the source code does not contain English keywords that have Czech translations.
@@ -145,9 +223,6 @@ def transpile(code):
     """
     Transpile Czech code to Python with safety checks.
     
-    Validations:
-    1. No English keywords should be used (source must be pure Czech)
-    
     Transformations:
     1. Czech keywords to English keywords
     2. Decimal separator: , to .
@@ -155,6 +230,9 @@ def transpile(code):
     4. List separators: ; to ,
     """
     try:
+        # Validate that all variables are capitalized
+        validate_variables_capitalized(code)
+        
         # Validate that no English keywords are used
         validate_no_english_keywords(code)
         
