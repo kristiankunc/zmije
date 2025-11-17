@@ -1,7 +1,7 @@
 import io
 import tokenize
 
-from internal.data import KEYWORD_MAP
+from zmije.internal.data import KEYWORD_MAP
 
 # Keywords that are often used as variable names or are ambiguous
 AMBIGUOUS_KEYWORDS = {("a",)}
@@ -191,11 +191,12 @@ def transpile(code):
         print(f"Error during transpilation: {e}")
         raise
 
-with open("example.zm", "r", encoding="utf-8") as f:
-    source_code = f.read()
+if __name__ == "__main__":
+    with open("example.zm", "r", encoding="utf-8") as f:
+        source_code = f.read()
 
-transpiled_code = transpile(source_code)
-with open("example.py", "w", encoding="utf-8") as f:
-    f.write(transpiled_code)
+    transpiled_code = transpile(source_code)
+    with open("example.py", "w", encoding="utf-8") as f:
+        f.write(transpiled_code)
 
 

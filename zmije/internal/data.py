@@ -1,7 +1,6 @@
 KEYWORD_MAP = {
     # Multi-word keywords (must come before single-word to match first)
     # Keywords
-    ("právě", "když"): "if",
     ("Lež",): "False",
     ("Nic",): "None",
     ("Pravda",): "True",

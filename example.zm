@@ -20,7 +20,7 @@ data = {„seznam": [1; 2; 3]; „vnorený": {„a": 1; „b": 2}}
 vytiskni(„Hodnoty:"; 1; 2; 3; 4)
 
 # Podmínka
-právě když x > 0:
+když x > 0:
     vytiskni(„x je kladné číslo")
 jinkdyž x < 0:
     vytiskni(„x je záporné číslo")
