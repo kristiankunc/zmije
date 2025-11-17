@@ -30,10 +30,6 @@ textík = „Ahoj světe“
 
 ### Desetinná čísla
 
-```zmije
-ludolfovo_číslo = 3,14
-```
-
 V češtině se jako oddělovač desetinných míst používá čárka místo tečky. Například:
 
 ```zmije
